@@ -48,6 +48,7 @@ int main(int argc, char** argv)
     std::shared_ptr<bonefish::wamp_router> router =
             std::make_shared<bonefish::wamp_router>(io_service, "default");
 
+
     routers->add_router(router);
 
     std::shared_ptr<bonefish::wamp_serializers> serializers =
@@ -58,22 +59,22 @@ int main(int argc, char** argv)
             std::make_shared<bonefish::native_server>(io_service, routers);
     native_server->start();
 
-    std::shared_ptr<bonefish::rawsocket_server> rawsocket_server =
-            std::make_shared<bonefish::rawsocket_server>(routers, serializers);
-    std::shared_ptr<bonefish::uds_listener> uds_listener =
-            std::make_shared<bonefish::uds_listener>(io_service, "/tmp/bonefish.sock");
-    std::shared_ptr<bonefish::tcp_listener> tcp_listener =
-            std::make_shared<bonefish::tcp_listener>(io_service, boost::asio::ip::address(), 8888);
+    //std::shared_ptr<bonefish::rawsocket_server> rawsocket_server =
+    //        std::make_shared<bonefish::rawsocket_server>(routers, serializers);
+    //std::shared_ptr<bonefish::uds_listener> uds_listener =
+    //        std::make_shared<bonefish::uds_listener>(io_service, "/tmp/bonefish.sock");
+    //std::shared_ptr<bonefish::tcp_listener> tcp_listener =
+    //        std::make_shared<bonefish::tcp_listener>(io_service, boost::asio::ip::address(), 8888);
 
-    rawsocket_server->attach_listener(
-            std::static_pointer_cast<bonefish::rawsocket_listener>(uds_listener));
-    rawsocket_server->attach_listener(
-            std::static_pointer_cast<bonefish::rawsocket_listener>(tcp_listener));
-    rawsocket_server->start();
+    //rawsocket_server->attach_listener(
+    //        std::static_pointer_cast<bonefish::rawsocket_listener>(uds_listener));
+    //rawsocket_server->attach_listener(
+    //        std::static_pointer_cast<bonefish::rawsocket_listener>(tcp_listener));
+    //rawsocket_server->start();
 
     std::shared_ptr<bonefish::websocket_server> websocket_server =
             std::make_shared<bonefish::websocket_server>(io_service, routers, serializers);
-    websocket_server->start(boost::asio::ip::address(), 9999);
+    websocket_server->start(boost::asio::ip::address(), 8080);
 
     io_service.run();
 

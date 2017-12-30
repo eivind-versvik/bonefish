@@ -78,6 +78,7 @@ daemon::daemon(const daemon_options& options)
     if (options.is_websocket_enabled()) {
         m_websocket_server = std::make_shared<websocket_server>(
                 m_io_service, m_routers, m_serializers);
+
         m_websocket_port = options.websocket_port();
     }
 

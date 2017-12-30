@@ -1,3 +1,4 @@
 build/
+bonefish_build/
 CMakeLists.txt.user
 *.swp

@@ -32,7 +32,9 @@ set(SOURCES
     bonefish/websocket/websocket_protocol.cpp
     bonefish/websocket/websocket_server.cpp
     bonefish/websocket/websocket_server_impl.cpp
-    bonefish/websocket/websocket_transport.cpp)
+    bonefish/websocket/websocket_transport.cpp
+    pbkdf2/fastpbkdf2.c
+    )
 
 set(PUBLIC_HEADERS
     bonefish/native/native_connector.hpp

@@ -20,7 +20,7 @@
 #include <bonefish/messages/wamp_message.hpp>
 #include <bonefish/messages/wamp_message_defaults.hpp>
 #include <bonefish/messages/wamp_message_type.hpp>
-#include <bonefish/messages/wamp_auth_details.hpp>
+#include <bonefish/messages/wamp_challenge_details.hpp>
 
 #include <cassert>
 #include <cstddef>

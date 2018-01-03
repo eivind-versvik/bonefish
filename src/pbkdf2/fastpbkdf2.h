@@ -22,56 +22,14 @@
 extern "C" {
 #endif
 
-/** Calculates PBKDF2-HMAC-SHA1.
- *
- *  @p npw bytes at @p pw are the password input.
- *  @p nsalt bytes at @p salt are the salt input.
- *  @p iterations is the PBKDF2 iteration count and must be non-zero.
- *  @p nout bytes of output are written to @p out.  @p nout must be non-zero.
- *
- *  This function cannot fail; it does not report errors.
- */
-void fastpbkdf2_hmac_sha1(const uint8_t *pw, size_t npw,
-                          const uint8_t *salt, size_t nsalt,
-                          uint32_t iterations,
-                          uint8_t *out, size_t nout);
+char *base64encode (const void *b64_encode_this, int encode_this_many_bytes);
 
-/** Calculates PBKDF2-HMAC-SHA256.
- *
- *  @p npw bytes at @p pw are the password input.
- *  @p nsalt bytes at @p salt are the salt input.
- *  @p iterations is the PBKDF2 iteration count and must be non-zero.
- *  @p nout bytes of output are written to @p out.  @p nout must be non-zero.
- *
- *  This function cannot fail; it does not report errors.
- */
-void fastpbkdf2_hmac_sha256(const uint8_t *pw, size_t npw,
-                            const uint8_t *salt, size_t nsalt,
-                            uint32_t iterations,
-                            uint8_t *out, size_t nout);
+unsigned char* hmac_sha256(const void *key, int keylen,
+                           const unsigned char *data, int datalen,
+                           unsigned char *result, unsigned int* resultlen);
 
-/** Calculates PBKDF2-HMAC-SHA512.
- *
- *  @p npw bytes at @p pw are the password input.
- *  @p nsalt bytes at @p salt are the salt input.
- *  @p iterations is the PBKDF2 iteration count and must be non-zero.
- *  @p nout bytes of output are written to @p out.  @p nout must be non-zero.
- *
- *  This function cannot fail; it does not report errors.
- */
-void fastpbkdf2_hmac_sha512(const uint8_t *pw, size_t npw,
-                            const uint8_t *salt, size_t nsalt,
-                            uint32_t iterations,
-                            uint8_t *out, size_t nout);
+char *base64decode (const void *b64_decode_this, int decode_this_many_bytes);
 
-char *base64( const unsigned char *src, size_t sz );
-
-void hmac_sha256(
-    const unsigned char *text,      /* pointer to data stream        */
-    int                 text_len,   /* length of data stream         */
-    const unsigned char *key,       /* pointer to authentication key */
-    int                 key_len,    /* length of authentication key  */
-    void                *digest);    /* caller digest to be filled in */
 
 #ifdef __cplusplus
 }

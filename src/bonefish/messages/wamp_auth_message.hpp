@@ -21,7 +21,6 @@
 #include <bonefish/messages/wamp_message.hpp>
 #include <bonefish/messages/wamp_message_defaults.hpp>
 #include <bonefish/messages/wamp_message_type.hpp>
-#include <bonefish/roles/wamp_role.hpp>
 
 #include <cassert>
 #include <cstddef>
@@ -48,16 +47,11 @@ public:
             const std::vector<msgpack::object>& fields,
             msgpack::zone&& zone) override;
 
-    wamp_session_id get_session_id() const;
-    const msgpack::object& get_details() const;
-
-    void set_session_id(const wamp_session_id& session_id);
-    void set_details(const msgpack::object&);
+    std::string get_response() const;
 
 private:
     msgpack::object m_type;
-    msgpack::object m_session_id;
-    msgpack::object m_details;
+    msgpack::object m_response;
 
 private:
     static const size_t NUM_FIELDS = 3;
@@ -71,8 +65,7 @@ inline wamp_auth_message::wamp_auth_message()
 inline wamp_auth_message::wamp_auth_message(msgpack::zone&& zone)
     : wamp_message(std::move(zone))
     , m_type(wamp_message_type::AUTHENTICATE)
-    , m_session_id()
-    , m_details(msgpack_empty_map())
+    , m_response()
 {
 }
 
@@ -87,7 +80,7 @@ inline wamp_message_type wamp_auth_message::get_type() const
 
 inline std::vector<msgpack::object> wamp_auth_message::marshal() const
 {
-    std::vector<msgpack::object> fields { m_type, m_session_id, m_details };
+    std::vector<msgpack::object> fields { m_type, m_response };
     return fields;
 }
 
@@ -104,37 +97,21 @@ inline void wamp_auth_message::unmarshal(
     }
 
     acquire_zone(std::move(zone));
-    m_session_id = fields[1];
-    m_details = fields[2];
+    m_response = fields[1];
 }
 
-inline wamp_session_id wamp_auth_message::get_session_id() const
+inline std::string wamp_auth_message::get_response() const 
 {
-    return wamp_session_id(m_session_id.as<uint64_t>());
-}
-
-inline const msgpack::object& wamp_auth_message::get_details() const
-{
-    return m_details;
-}
-
-inline void wamp_auth_message::set_session_id(const wamp_session_id& session_id)
-{
-    m_session_id = msgpack::object(session_id.id());
-}
-
-inline void wamp_auth_message::set_details(const msgpack::object& details)
-{
-    assert(details.type == msgpack::type::MAP);
-    m_details = msgpack::object(details, get_zone());
+    return m_response.as<std::string>();
 }
 
 inline std::ostream& operator<<(std::ostream& os, const wamp_auth_message& message)
 {
-    os << "auth [" << message.get_session_id() << ", "
-            << message.get_details() << "]";
+    os << "auth [" << message.get_response() << "]";
     return os;
 }
+
+
 
 } // namespace bonefish
 

@@ -14,19 +14,19 @@
  *  limitations under the License.
  */
 
-#ifndef BONEFISH_MESSAGES_WAMP_AUTH_DETAILS_HPP
-#define BONEFISH_MESSAGES_WAMP_AUTH_DETAILS_HPP
+#ifndef BONEFISH_MESSAGES_WAMP_CHALLENGE_DETAILS_HPP
+#define BONEFISH_MESSAGES_WAMP_CHALLENGE_DETAILS_HPP
 
 #include <msgpack.hpp>
 #include <unordered_set>
 
 namespace bonefish {
 
-class wamp_auth_details
+class wamp_challenge_details
 {
 public:
-    wamp_auth_details();
-    virtual ~wamp_auth_details();
+    wamp_challenge_details();
+    virtual ~wamp_challenge_details();
 
     inline const int get_iterations() const;
     void set_iterations(int iterations);
@@ -44,43 +44,43 @@ private:
     std::string m_challenge;
 };
 
-inline wamp_auth_details::wamp_auth_details()
+inline wamp_challenge_details::wamp_challenge_details()
 {
 }
 
-inline wamp_auth_details::~wamp_auth_details()
+inline wamp_challenge_details::~wamp_challenge_details()
 {
 }
 
 
-inline const int wamp_auth_details::get_iterations() const
+inline const int wamp_challenge_details::get_iterations() const
 {
     return m_iterations;
 }
 
-inline void wamp_auth_details::set_iterations(int iterations)
+inline void wamp_challenge_details::set_iterations(int iterations)
 {
     m_iterations = iterations;
 }
 
 
-inline const std::string wamp_auth_details::get_challenge() const
+inline const std::string wamp_challenge_details::get_challenge() const
 {
     return m_challenge;
 }
 
-inline void wamp_auth_details::set_challenge(std::string challenge)
+inline void wamp_challenge_details::set_challenge(std::string challenge)
 {
     m_challenge = challenge;
 }
 
 
-inline const std::string wamp_auth_details::get_salt() const
+inline const std::string wamp_challenge_details::get_salt() const
 {
     return m_salt;
 }
 
-inline void wamp_auth_details::set_salt(std::string salt)
+inline void wamp_challenge_details::set_salt(std::string salt)
 {
     m_salt = salt;
 }
@@ -89,4 +89,4 @@ inline void wamp_auth_details::set_salt(std::string salt)
 
 
 
-#endif // BONEFISH_MESSAGES_WAMP_AUTH_DETAILS_HPP
+#endif // BONEFISH_MESSAGES_WAMP_CHALLENGE_DETAILS_HPP

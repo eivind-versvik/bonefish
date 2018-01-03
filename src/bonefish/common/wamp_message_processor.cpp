@@ -23,6 +23,7 @@
 #include <bonefish/messages/wamp_goodbye_message.hpp>
 #include <bonefish/messages/wamp_hello_details.hpp>
 #include <bonefish/messages/wamp_hello_message.hpp>
+#include <bonefish/messages/wamp_challenge_message.hpp>
 #include <bonefish/messages/wamp_message.hpp>
 #include <bonefish/messages/wamp_publish_message.hpp>
 #include <bonefish/messages/wamp_register_message.hpp>
@@ -35,6 +36,9 @@
 #include <bonefish/session/wamp_session.hpp>
 #include <bonefish/trace/trace.hpp>
 #include <bonefish/transport/wamp_transport.hpp>
+#include <pbkdf2/fastpbkdf2.h>
+#include <openssl/sha.h>
+
 
 namespace bonefish {
 
@@ -47,7 +51,12 @@ void wamp_message_processor::process_message(
     switch (message->get_type())
     {
         case wamp_message_type::AUTHENTICATE:
+        {
+            std::unique_ptr<wamp_abort_message> abort_message(new wamp_abort_message);
+            abort_message->set_reason("wamp.error.authentication_failed");
+            transport->send_message(std::move(*abort_message));
             break;
+        }
         case wamp_message_type::CALL:
         {
             std::shared_ptr<wamp_router> router = m_routers->get_router(connection->get_realm());
@@ -88,6 +97,34 @@ void wamp_message_processor::process_message(
                 abort_message->set_reason("wamp.error.no_such_realm");
                 transport->send_message(std::move(*abort_message));
             } else {
+                char secret[100]; 
+                char challenge[BUFSIZ];
+                memset( challenge, 0x00, BUFSIZ );
+
+                fastpbkdf2_hmac_sha256((uint8_t*)"123456", sizeof("123456"),
+                            (uint8_t*)"123456", sizeof("123456"),
+                            1000,
+                            (uint8_t*)secret, sizeof(secret));
+                hmac_sha256(
+                        (unsigned char*)"challenge",      /* pointer to data stream        */
+                        sizeof("challenge"),   /* length of data stream         */
+                        (unsigned char*)secret,       /* pointer to authentication key */
+                        strlen(secret),    /* length of authentication key  */
+                        challenge);
+                char *p = base64( (unsigned char*)challenge, 
+                    SHA256_DIGEST_LENGTH );
+                printf("################ %s ################\n", p);
+                std::unique_ptr<wamp_challenge_message> challenge_message(new wamp_challenge_message);
+                std::unique_ptr<wamp_auth_details> authDetails(new wamp_auth_details);
+                authDetails->set_salt("123456");
+                //authDetails->set_challenge("{\"authprovider\": \"dynamic\", \"authrole\": \"frontend\", \"authmethod\": \"wampcra\", \"authid\": \"admin\", \"session\": 7391226479373996, \"nonce\": \"5EBoC49vr+eGX3whH+3MxDFE1UxqCrrG7goo51mXA3HLrk55vG+QMT1AYUnIoQiR\", \"timestamp\": \"2018-01-02T23:27:28.774Z\"}");
+                authDetails->set_challenge("challenge");
+                authDetails->set_iterations(1000);
+                challenge_message->set_method("wampcra");
+                challenge_message->set_authDetails(authDetails->marshal(challenge_message->get_zone()));
+                transport->send_message(std::move(*challenge_message));
+                break;
+
                 wamp_session_id id;
                 auto generator = router->get_session_id_generator();
                 do {

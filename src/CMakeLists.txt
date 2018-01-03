@@ -11,6 +11,7 @@ set(SOURCES
     bonefish/messages/wamp_message_type.cpp
     bonefish/messages/wamp_result_details.cpp
     bonefish/messages/wamp_welcome_details.cpp
+    bonefish/messages/wamp_auth_details.cpp
     bonefish/messages/wamp_yield_options.cpp
     bonefish/native/native_connection.cpp
     bonefish/native/native_server.cpp
@@ -88,6 +89,9 @@ set(PRIVATE_HEADERS
     bonefish/messages/wamp_goodbye_message.hpp
     bonefish/messages/wamp_hello_details.hpp
     bonefish/messages/wamp_hello_message.hpp
+    bonefish/messages/wamp_challenge_message.hpp
+    bonefish/messages/wamp_auth_message.hpp
+    bonefish/messages/wamp_auth_details.hpp
     bonefish/messages/wamp_invocation_details.hpp
     bonefish/messages/wamp_invocation_message.hpp
     bonefish/messages/wamp_message.hpp
@@ -136,7 +140,7 @@ set(PRIVATE_HEADERS
 add_library(bonefish STATIC ${SOURCES} ${PUBLIC_HEADERS} ${PRIVATE_HEADERS})
 
 target_link_libraries(bonefish
-    ${Boost_LIBRARIES})
+    ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES})
 
 foreach(h ${PUBLIC_HEADERS})
     get_filename_component(HEADER_INCLUDE_DIRECTORY include/${h} PATH) # use DIRECTORY instead of PATH once requiring CMake 3.0

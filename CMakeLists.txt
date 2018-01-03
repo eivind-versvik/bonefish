@@ -63,9 +63,12 @@ if(WIN32)
     add_definitions(-DWIN32_LEAN_AND_MEAN)
 endif()
 
+include(FindOpenSSL)
+
 find_package(Boost REQUIRED COMPONENTS ${BOOST_COMPONENTS})
 find_package(RT)
 find_package(Threads)
+find_package(OpenSSL)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/src

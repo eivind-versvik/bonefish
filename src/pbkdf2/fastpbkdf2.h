@@ -64,6 +64,15 @@ void fastpbkdf2_hmac_sha512(const uint8_t *pw, size_t npw,
                             uint32_t iterations,
                             uint8_t *out, size_t nout);
 
+char *base64( const unsigned char *src, size_t sz );
+
+void hmac_sha256(
+    const unsigned char *text,      /* pointer to data stream        */
+    int                 text_len,   /* length of data stream         */
+    const unsigned char *key,       /* pointer to authentication key */
+    int                 key_len,    /* length of authentication key  */
+    void                *digest);    /* caller digest to be filled in */
+
 #ifdef __cplusplus
 }
 #endif

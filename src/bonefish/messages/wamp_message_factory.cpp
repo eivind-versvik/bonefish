@@ -16,6 +16,8 @@
 
 #include <bonefish/messages/wamp_message_factory.hpp>
 #include <bonefish/messages/wamp_abort_message.hpp>
+#include <bonefish/messages/wamp_challenge_message.hpp>
+#include <bonefish/messages/wamp_auth_message.hpp>
 #include <bonefish/messages/wamp_call_message.hpp>
 #include <bonefish/messages/wamp_error_message.hpp>
 #include <bonefish/messages/wamp_event_message.hpp>
@@ -56,10 +58,10 @@ wamp_message* create_message(wamp_message_type type)
             message = new wamp_abort_message;
             break;
         case wamp_message_type::CHALLENGE:
-            message = nullptr;
+            message = new wamp_challenge_message;
             break;
         case wamp_message_type::AUTHENTICATE:
-            message = nullptr;
+            message = new wamp_auth_message;
             break;
         case wamp_message_type::GOODBYE:
             message = new wamp_goodbye_message;

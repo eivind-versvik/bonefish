@@ -241,7 +241,7 @@ void rawsocket_server_impl::on_message(
     try {
         std::shared_ptr<wamp_serializer> serializer =
                 m_serializers->get_serializer(wamp_serializer_type::MSGPACK);
-        std::unique_ptr<wamp_message> message(
+        std::shared_ptr<wamp_message> message(
                 serializer->deserialize(buffer, length));
         std::unique_ptr<wamp_transport> transport(
                 new rawsocket_transport(serializer, connection));

@@ -188,7 +188,7 @@ void native_server_impl::on_message(
         }
 
         auto type = static_cast<wamp_message_type>(fields[0].as<unsigned>());
-        std::unique_ptr<wamp_message> message(wamp_message_factory::create_message(type));
+        std::shared_ptr<wamp_message> message(wamp_message_factory::create_message(type));
         if (!message) {
             throw std::runtime_error("message type not supported");
         }

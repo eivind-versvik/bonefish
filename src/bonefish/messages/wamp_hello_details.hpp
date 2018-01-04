@@ -36,10 +36,12 @@ public:
 
     const std::unordered_set<wamp_role>& get_roles() const;
     const wamp_role* get_role(wamp_role_type role_type) const;
+    const std::string& get_authid() const;
     void add_role(wamp_role&& role);
 
 private:
     std::unordered_set<wamp_role> m_roles;
+    std::string m_authid;
 };
 
 inline wamp_hello_details::wamp_hello_details()
@@ -54,6 +56,12 @@ inline wamp_hello_details::~wamp_hello_details()
 inline const std::unordered_set<wamp_role>& wamp_hello_details::get_roles() const
 {
     return m_roles;
+}
+
+
+inline const std::string& wamp_hello_details::get_authid() const
+{
+    return m_authid;
 }
 
 inline const wamp_role* wamp_hello_details::get_role(wamp_role_type role_type) const

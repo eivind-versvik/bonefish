@@ -209,7 +209,7 @@ void websocket_server_impl::on_message(websocketpp::connection_hdl handle,
     }
 
     try {
-        std::unique_ptr<wamp_message> message(
+        std::shared_ptr<wamp_message> message(
                 serializer->deserialize(buffer->get_payload().c_str(), buffer->get_payload().size()));
         std::unique_ptr<wamp_transport> transport(
                 new websocket_transport(serializer, handle, m_server));

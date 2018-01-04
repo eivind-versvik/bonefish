@@ -43,8 +43,10 @@
 
 
 namespace bonefish {
+
+
 void wamp_message_processor::process_message(
-        const std::unique_ptr<wamp_message>& message,
+        const std::shared_ptr<wamp_message>& message,
         std::unique_ptr<wamp_transport>&& transport,
         wamp_connection_base* connection)
 {
@@ -54,10 +56,10 @@ void wamp_message_processor::process_message(
         case wamp_message_type::AUTHENTICATE:
         {
             wamp_auth_message* auth_message = static_cast<wamp_auth_message*>(message.get());
-            if(strncmp(connection->get_challenge_signature(), auth_message->get_response().c_str(), strlen(connection->get_challenge_signature())) == 0) {
+            if(connection->get_challenge_signature() == auth_message->get_response()) {
                 wamp_session_id id;
                 BONEFISH_TRACE("came here1");
-                std::shared_ptr<wamp_hello_message> hello_message = connection->get_pending_hello_message();
+                wamp_hello_message* hello_message = static_cast<wamp_hello_message*>(connection->get_pending_hello_message().get());
                 BONEFISH_TRACE("came here2");
                 std::shared_ptr<wamp_router> router = m_routers->get_router(hello_message->get_realm());
                 BONEFISH_TRACE("came here4");
@@ -81,9 +83,9 @@ void wamp_message_processor::process_message(
                 session->set_roles(hello_details.get_roles());
                 BONEFISH_TRACE("came here6");
                 router->attach_session(session);
-                router->process_hello_message(id, hello_message.get());  
+                router->process_hello_message(id, hello_message);  
             } else {
-                BONEFISH_TRACE("came here1111");
+                BONEFISH_TRACE("Wrong credentials");
                 std::unique_ptr<wamp_abort_message> abort_message(new wamp_abort_message);
                 abort_message->set_reason("wamp.error.authentication_failed");
                 transport->send_message(std::move(*abort_message));                
@@ -125,6 +127,9 @@ void wamp_message_processor::process_message(
         {
             wamp_hello_message* hello_message = static_cast<wamp_hello_message*>(message.get());
             std::shared_ptr<wamp_router> router = m_routers->get_router(hello_message->get_realm());
+            wamp_hello_details hello_details; 
+            hello_details.unmarshal(hello_message->get_details());
+
             if (!router) {
                 std::unique_ptr<wamp_abort_message> abort_message(new wamp_abort_message);
                 abort_message->set_reason("wamp.error.no_such_realm");
@@ -132,6 +137,15 @@ void wamp_message_processor::process_message(
             } else {
                 //TODO check cookie or check local connection
                 if(true) {
+
+                    if(hello_details.get_authid() == "anonymous")
+                    {
+                        BONEFISH_TRACE("Abort - anonymous user not allowed here");
+                        std::unique_ptr<wamp_abort_message> abort_message(new wamp_abort_message);
+                        abort_message->set_reason("wamp.error.authentication_failed");
+                        transport->send_message(std::move(*abort_message));
+                        break;
+                    }
                     //TODO get secret from db
                     char secret[] = "UJ3V7rWSrwHSPxOFzrlhttU8QRLU6SBIb8LpH6KIogI=";
                     char signature[BUFSIZ];
@@ -145,13 +159,17 @@ void wamp_message_processor::process_message(
                                (unsigned char*)signature, &resultLen);
                     char *p = base64encode(signature, 32);
                     //now store
-                    connection->set_challenge_signature(p);
-                    //connection->set_pending_hello_message(std::make_shared<wamp_hello_message>(std::move(*hello_message)));
+                    //TODO check who frees memory
+                    connection->set_challenge_signature(*(new std::string(p)));
+
+                    //std::shared_ptr hello_message = std::make_shared<wamp_hello_message>();
+                    connection->set_pending_hello_message(message);
 
                     std::unique_ptr<wamp_challenge_message> challenge_message(new wamp_challenge_message);
                     std::unique_ptr<wamp_challenge_details> challengeDetails(new wamp_challenge_details);
                     //TODO set reasonable salt
                     challengeDetails->set_salt("123456");
+                    //TODO set reasonable challenge
                     //challengeDetails->set_challenge("{\"authprovider\": \"dynamic\", \"authrole\": \"frontend\", \"authmethod\": \"wampcra\", \"authid\": \"admin\", \"session\": 7391226479373996, \"nonce\": \"5EBoC49vr+eGX3whH+3MxDFE1UxqCrrG7goo51mXA3HLrk55vG+QMT1AYUnIoQiR\", \"timestamp\": \"2018-01-02T23:27:28.774Z\"}");
                     challengeDetails->set_challenge("challenge");
                     challengeDetails->set_iterations(1000);
@@ -171,7 +189,6 @@ void wamp_message_processor::process_message(
                     // We need to setup the sessions roles before attaching the session
                     // so that we know whether or not to also attach the session to the
                     // dealer and the broker.
-                    wamp_hello_details hello_details; 
                     hello_details.unmarshal(hello_message->get_details());
 
                     auto session = std::make_shared<wamp_session>(

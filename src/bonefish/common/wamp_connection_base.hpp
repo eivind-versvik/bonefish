@@ -37,20 +37,19 @@ public:
     void set_session_id(const wamp_session_id& id);
     const wamp_session_id& get_session_id() const;
 
-    char* get_challenge_signature() const;
-    void set_challenge_signature(char* signature);
+    const std::string& get_challenge_signature() const;
+    void set_challenge_signature(std::string& signature);
 
-    std::shared_ptr<wamp_hello_message> get_pending_hello_message() const;
-    void set_pending_hello_message(std::shared_ptr<wamp_hello_message>&& hello_message);
+    std::shared_ptr<wamp_message> get_pending_hello_message() const;
+    void set_pending_hello_message(const std::shared_ptr<wamp_message>& hello_message);
 
     void clear_data();
 
 private:
     std::string m_realm;
     wamp_session_id m_session_id;
-    //TODO maybe use string?
-    char* m_challenge_signature;
-    std::shared_ptr<wamp_hello_message> m_pending_hello_message;
+    std::string m_challenge_signature;
+    std::shared_ptr<wamp_message> m_pending_hello_message;
 };
 
 inline wamp_connection_base::wamp_connection_base()
@@ -61,8 +60,6 @@ inline wamp_connection_base::wamp_connection_base()
 
 inline wamp_connection_base::~wamp_connection_base()
 {
-    if(m_challenge_signature) 
-        free(m_challenge_signature);
 }
 
 inline bool wamp_connection_base::has_realm() const
@@ -70,23 +67,23 @@ inline bool wamp_connection_base::has_realm() const
     return !m_realm.empty();
 }
 
-inline std::shared_ptr<wamp_hello_message> wamp_connection_base::get_pending_hello_message() const
+inline std::shared_ptr<wamp_message> wamp_connection_base::get_pending_hello_message() const
 {
     return m_pending_hello_message;
 }
 
 
-inline void wamp_connection_base::set_pending_hello_message(std::shared_ptr<wamp_hello_message>&& hello_message)
+inline void wamp_connection_base::set_pending_hello_message(const std::shared_ptr<wamp_message>& hello_message)
 {
     m_pending_hello_message = hello_message;
 }
 
-inline char* wamp_connection_base::get_challenge_signature() const
+inline const std::string& wamp_connection_base::get_challenge_signature() const
 {
     return m_challenge_signature;
 }
 
-inline void wamp_connection_base::set_challenge_signature(char* challenge_signature)
+inline void wamp_connection_base::set_challenge_signature(std::string& challenge_signature)
 {
     m_challenge_signature = challenge_signature;
 }

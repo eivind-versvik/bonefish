@@ -57,6 +57,13 @@ void wamp_hello_details::unmarshal(const msgpack::object& object)
         role.set_features(std::move(features));
         add_role(std::move(role));
     }
+
+    details_itr = details.find("authid");
+    if (details_itr == details.end()) {
+        return;
+    }
+
+    details_itr->second.convert(&m_authid);
 }
 
 } // namespace bonefish

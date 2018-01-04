@@ -36,7 +36,7 @@ public:
             const std::shared_ptr<wamp_routers>& routers);
 
     void process_message(
-            const std::unique_ptr<wamp_message>& message,
+            const std::shared_ptr<wamp_message>& message,
             std::unique_ptr<wamp_transport>&& transport,
             wamp_connection_base* connection_base);
 

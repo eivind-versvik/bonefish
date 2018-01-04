@@ -136,8 +136,8 @@ void wamp_message_processor::process_message(
                 transport->send_message(std::move(*abort_message));
             } else {
                 //TODO check cookie or check local connection
-                if(true) {
-
+                if(hello_details.get_authid() != "techuser")
+                {
                     if(hello_details.get_authid() == "anonymous")
                     {
                         BONEFISH_TRACE("Abort - anonymous user not allowed here");
